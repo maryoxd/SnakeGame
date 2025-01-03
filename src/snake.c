@@ -3,7 +3,7 @@
 
 void snake_init(Snake *snake, int start_x, int start_y) {
   snake->length = 3;
-  snake->direction = RIGHT;
+  snake->direction = DOWN;
 
   for(int i = 0; i < snake->length; i++) {
     snake->body[i].x = start_x - i;
