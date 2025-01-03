@@ -1,6 +1,8 @@
 #ifndef WORLD_H
 #define WORLD_H
 
+#include "common.h"
+
 #define MAX_WIDTH 100
 #define MAX_HEIGHT 100
 
