@@ -20,11 +20,8 @@ int fruit_manager_load(FruitManager *manager, const char *filename) {
   while(fscanf(file, "%d %d", &x, &y) == 2) {
     manager->fruits[manager->count].x = x;
     manager->fruits[manager->count].y = y;
-    printf("Nacitane ovocie: %d, %d,\n", x, y);
     manager->count++;
   }
-
-  printf("Pocet nacitanych ovoci: %d\n", manager->count);
   
   fclose(file);
   return 0;
@@ -37,7 +34,5 @@ int fruit_next(FruitManager *manager, Fruit *fruit) {
   }
   *fruit = manager->fruits[manager->current_index];
   manager->current_index++;
-
-  printf("Posun na ovocie: %d %d, Index: %d\n", fruit->x, fruit->y, manager->current_index);
   return 0;
 }

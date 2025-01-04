@@ -19,7 +19,7 @@ typedef struct {
 
 void snake_init(Snake *snake, int start_x, int start_y);
 void snake_set_direction(Snake *snake, Direction dir);
-int snake_move(Snake *snake, World *world, bool *ate_fruit);
-bool snake_check_collision(const Snake *snake, const World *world);
+int snake_move(Snake *snake, World *world, bool *ate_fruit, int key);
+bool snake_check_collision(const Snake *snake);
 
 #endif

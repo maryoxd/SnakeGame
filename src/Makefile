@@ -1,10 +1,13 @@
+# Kompilátor a flagy
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c11
 
-SRCS = main.c snake.c fruit.c world.c
+# Súbory
+SRCS = main.c snake.c fruit.c world.c input.c common.c
 OBJS = $(SRCS:.c=.o)
 TARGET = game
 
+# Ciele
 all: $(TARGET)
 
 $(TARGET): $(OBJS)

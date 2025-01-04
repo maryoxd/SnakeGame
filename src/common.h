@@ -1,18 +1,19 @@
 #ifndef COMMON_H
 #define COMMON_H
 
+#include <time.h>  // Ak je to potrebné aj tu
+
 typedef struct {
-  int x;
-  int y;
+    int x;
+    int y;
 } Position;
 
-#define EMPTY ' ' // prazdno
-#define WALL '#' // stena
-#define SNAKE 'O' // had
-#define FRUIT '*' // ovocie
+#define EMPTY ' '   // Prazdno
+#define WALL '#'    // Stena
+#define SNAKE 'O'   // Had
+#define FRUIT '*'   // Ovocie
 
-
+void sleep_microseconds(long microseconds);
 
 #endif
-
 
