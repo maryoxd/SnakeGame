@@ -45,7 +45,9 @@ void world_draw(const World *world) {
         printf("\033[1;32m%c\033[0m", c);
       } else if(c == SNAKE) {
         printf("\033[38;5;214m%c\033[0m", c);
-      } 
+      } else if(c == WALL) {
+        printf("\033[1;34m%c\033[0m", c);
+      }
       else {
         printf("%c", c);
       }

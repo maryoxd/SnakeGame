@@ -5,19 +5,6 @@
 #include <arpa/inet.h>
 #include "gamestate.h" // Zabezpečíme správny include GameState
 
-// Funkcia na vykreslenie herného stavu
-void draw_game(const GameState *state) {
-    system("clear");
-    printf("Skore: %d\n", state->score);
-    printf("Cas: %d sekund\n", state->elapsed_time);
-    for (int i = 0; i < state->world.height; i++) {
-        for (int j = 0; j < state->world.width; j++) {
-            putchar(state->world.grid[i][j]);
-        }
-        putchar('\n');
-    }
-}
-
 int main(int argc, char *argv[]) {
     if (argc < 2) {
         fprintf(stderr, "Použitie: %s <port>\n", argv[0]);
@@ -56,16 +43,16 @@ int main(int argc, char *argv[]) {
 
     // Hlavná herná slučka
     while (1) {
-        
-        printf("Cakam na udaje od servera..\n");
+        // Prijímanie stavu hry od servera
+        printf("Čakám na údaje od servera...\n");
         if (read(sockfd, &game_state, sizeof(game_state)) <= 0) {
             printf("Spojenie so serverom bolo ukončené\n");
             break;
         }
-        printf("Herny stav prijaty.\n");
+        printf("Herný stav prijatý.\n");
 
-        // Vykreslenie herného stavu
-        draw_game(&game_state);
+        // Vykreslenie herného stavu cez `gamestate_draw`
+        gamestate_draw(&game_state);
 
         // Kontrola, či hra skončila
         if (gamestate_is_game_over(&game_state)) {
@@ -73,11 +60,12 @@ int main(int argc, char *argv[]) {
             break;
         }
 
-        // Posielanie vstupu serveru
+        // Získanie vstupu od používateľa
         printf("Napíšte smer pohybu (w/a/s/d): ");
         input = getchar();
         getchar(); // Odstránenie '\n' zo vstupu
 
+        // Posielanie vstupu serveru
         if (write(sockfd, &input, sizeof(input)) <= 0) {
             perror("Chyba pri posielaní vstupu serveru");
             break;
@@ -87,3 +75,4 @@ int main(int argc, char *argv[]) {
     close(sockfd);
     return 0;
 }
+
