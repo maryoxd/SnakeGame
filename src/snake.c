@@ -1,6 +1,5 @@
 #include "snake.h"
 #include <stdio.h>
-#include <termios.h>
 #include <unistd.h>
 
 void snake_init(Snake *snake, int start_x, int start_y) {
@@ -11,6 +10,7 @@ void snake_init(Snake *snake, int start_x, int start_y) {
     snake->body[i].x = start_x - i;
     snake->body[i].y = start_y;
   }
+  printf("Snake initialized at position: %d %d \n", snake->body[0].x, snake->body[0].y);
 }
 
 void snake_set_direction(Snake *snake, Direction dir) {
@@ -25,12 +25,13 @@ void snake_set_direction(Snake *snake, Direction dir) {
 int snake_move(Snake *snake, World *world, bool *ate_fruit, int key) {
 
   Position new_head = snake->body[0];
+  printf("Moving snake. currennt pos: %d %d, dir: %d\n", new_head.x, new_head.y, key);
 
   switch(key) {
+    case 0: new_head.y--; break;
     case 1: new_head.x--; break;
-    case 2: new_head.x++; break;
-    case 3: new_head.y--; break;
-    case 4: new_head.y++; break;
+    case 2: new_head.y++; break;
+    case 3: new_head.x++; break;
     default: return -1;
   }
 

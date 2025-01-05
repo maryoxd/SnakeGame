@@ -1,7 +1,6 @@
 #ifndef FRUIT_H
 #define FRUIT_H
 
-#include "world.h"
 #include "common.h"
 
 typedef struct {
@@ -11,7 +10,7 @@ typedef struct {
 } Fruit;
 
 typedef struct {
-  Fruit fruits[MAX_WIDTH * MAX_HEIGHT];
+  Fruit fruits[30 * 30];
   int count;
   int current_index;
 
