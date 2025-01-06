@@ -12,6 +12,54 @@ int running = 1;            // Indikátor pre hlavný cyklus klienta
 int sockfd;                 // Socket klienta
 pthread_mutex_t lock;       // Mutex pre synchronizáciu herného stavu
 
+// Funkcia na kontrolu, či server beží
+int check_server_running(const char *ip, int port) {
+    int sockfd;
+    struct sockaddr_in serv_addr;
+
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (sockfd < 0) {
+        perror("Chyba pri vytváraní socketu\n");
+        return 0;
+    }
+
+    memset(&serv_addr, 0, sizeof(serv_addr));
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_port = htons(port);
+
+    if (inet_pton(AF_INET, ip, &serv_addr.sin_addr) <= 0) {
+        close(sockfd);
+        return 0;
+    }
+
+    if (connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
+        close(sockfd);
+        return 0;
+    }
+
+    close(sockfd);
+    return 1;
+}
+
+// Funkcia na spustenie servera
+void start_server(const char *port) {
+    pid_t pid = fork();
+
+    if (pid == 0) {
+        // Detský proces -> spustenie servera
+        printf("Spúšťam server na porte %s...\n", port);
+        execlp("./server", "./server", port, (char *)NULL);
+        perror("Chyba pri spúšťaní servera");
+        exit(EXIT_FAILURE);
+    } else if (pid < 0) {
+        perror("Chyba pri fork()");
+        exit(EXIT_FAILURE);
+    }
+
+    // Rodič -> čakáme 1 sekundu na naštartovanie servera
+    sleep(1);
+}
+
 // Vlákno na čítanie stavu od servera
 void *receive_thread(void *arg) {
     while (running) {
@@ -47,7 +95,7 @@ void *input_thread(void *arg) {
             }
         }
 
-        usleep(50000); // Minimalná záťaž na CPU
+        usleep(50000); // Minimalizácia záťaže CPU
     }
 
     return NULL;
@@ -59,10 +107,19 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    int port = atoi(argv[1]);
-    struct sockaddr_in serv_addr;
+    const char *port = argv[1];
+    int port_num = atoi(port);
 
-    // Inicializácia socketu
+    // Kontrola, či server beží
+    if (!check_server_running("127.0.0.1", port_num)) {
+        printf("Server nebeží. Automaticky ho spúšťam...\n");
+        start_server(port);
+    } else {
+        printf("Server už beží na porte %s\n", port);
+    }
+
+    // Pripojenie k serveru
+    struct sockaddr_in serv_addr;
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0) {
         perror("Chyba pri vytváraní socketu");
@@ -71,9 +128,8 @@ int main(int argc, char *argv[]) {
 
     memset(&serv_addr, 0, sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
-    serv_addr.sin_port = htons(port);
+    serv_addr.sin_port = htons(port_num);
 
-    // Pripojenie k localhost
     if (inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr) <= 0) {
         perror("Chyba pri nastavovaní IP adresy");
         return 1;

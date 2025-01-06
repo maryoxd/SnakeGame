@@ -56,7 +56,7 @@ void *game_update_thread(void *arg) {
         usleep(100000); // Rýchlosť hry (100 ms)
     }
 
-    printf("Hra skončila.\n");
+    printf("Hra skončila! Skóre: %d\n", game_state.score);
     close(client_sock);
     return NULL;
 }
@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
     pthread_mutex_init(&game_lock, NULL);
 
     // Prijímanie klientov
-    while (!gamestate_is_game_over(&game_state)) {
+    while (1) {
         client_sock = accept(sockfd, (struct sockaddr *)&cli_addr, &cli_len);
         if (client_sock < 0) {
             perror("Chyba pri accept()");
