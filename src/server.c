@@ -2,49 +2,63 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <pthread.h>
 #include <netinet/in.h>
 #include "gamestate.h"
 
-GameState game_state;
+GameState game_state;          // Herný stav
+pthread_mutex_t game_lock;     // Mutex na synchronizáciu prístupu k hernému stavu
+int current_direction = 2;     // Smer pohybu (predvolene dole)
+int client_connected = 0;      // Indikátor pripojenia klienta
 
-// Funkcia na spracovanie klienta
-void handle_client(int client_sock) {
-    int direction = 2; // Predvolený smer (2 - dole)
+// Funkcia na spracovanie vstupov od klienta
+void *client_input_thread(void *arg) {
+    int client_sock = *(int *)arg;
     char input;
 
-    printf("Klient pripojený, začínam spracovanie...\n");
-    
-    if(write(client_sock, &game_state, sizeof(game_state)) <= 0) {
-    perror("Chyba pri posielani dat.\n");
-    close(client_sock);
-    return;
-  }
-
-    while (!gamestate_is_game_over(&game_state)) {
-        // Prijatie vstupu od klienta
+    while (1) {
         if (read(client_sock, &input, sizeof(input)) <= 0) {
-            perror("Chyba pri čítaní od klienta");
+            printf("Klient sa odpojil\n");
+            client_connected = 0;
             break;
         }
 
-        // Nastavenie smeru pohybu podľa vstupu
-        if (input == 'w') direction = 0; // Hore
-        if (input == 'a') direction = 1; // Doľava
-        if (input == 's') direction = 2; // Dole
-        if (input == 'd') direction = 3; // Doprava
-
-        // Aktualizácia herného stavu
-        gamestate_update(&game_state, direction);
-
-        // Posielanie aktuálneho herného stavu klientovi
-        if (write(client_sock, &game_state, sizeof(game_state)) <= 0) {
-            perror("Chyba pri posielaní dát klientovi");
-            break;
-        }
+        printf("Prijatý vstup od klienta: %c\n", input);
+        pthread_mutex_lock(&game_lock);
+        if (input == 'w') current_direction = 0; // Hore
+        if (input == 'a') current_direction = 1; // Doľava
+        if (input == 's') current_direction = 2; // Dole
+        if (input == 'd') current_direction = 3; // Doprava
+        pthread_mutex_unlock(&game_lock);
     }
 
-    printf("Klient sa odpojil alebo hra skončila.\n");
     close(client_sock);
+    return NULL;
+}
+
+// Funkcia na spracovanie hry
+void *game_update_thread(void *arg) {
+    int client_sock = *(int *)arg;
+
+    while (!gamestate_is_game_over(&game_state)) {
+        pthread_mutex_lock(&game_lock);
+        gamestate_update(&game_state, current_direction);
+        pthread_mutex_unlock(&game_lock);
+
+        if (client_connected) {
+            if (write(client_sock, &game_state, sizeof(game_state)) <= 0) {
+                printf("Chyba pri posielaní dát klientovi\n");
+                client_connected = 0;
+                break;
+            }
+        }
+
+        usleep(100000); // Rýchlosť hry (100 ms)
+    }
+
+    printf("Hra skončila.\n");
+    close(client_sock);
+    return NULL;
 }
 
 int main(int argc, char *argv[]) {
@@ -58,7 +72,7 @@ int main(int argc, char *argv[]) {
     struct sockaddr_in serv_addr, cli_addr;
     socklen_t cli_len = sizeof(cli_addr);
 
-    // Inicializácia serverového socketu
+    // Inicializácia socketu
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0) {
         perror("Chyba pri vytváraní socketu");
@@ -84,8 +98,9 @@ int main(int argc, char *argv[]) {
 
     printf("Server počúva na porte %d...\n", port);
 
-    // Inicializácia herného stavu
+    // Inicializácia herného stavu a mutexu
     gamestate_init(&game_state, "hernysvet.txt", "ovocie.txt");
+    pthread_mutex_init(&game_lock, NULL);
 
     // Prijímanie klientov
     while (!gamestate_is_game_over(&game_state)) {
@@ -95,10 +110,20 @@ int main(int argc, char *argv[]) {
             continue;
         }
 
-        handle_client(client_sock); // Spracovanie klienta
+        printf("Klient pripojený.\n");
+        client_connected = 1;
+
+        // Spustenie vlákien
+        pthread_t input_tid, update_tid;
+        pthread_create(&input_tid, NULL, client_input_thread, &client_sock);
+        pthread_create(&update_tid, NULL, game_update_thread, &client_sock);
+
+        pthread_join(input_tid, NULL);
+        pthread_join(update_tid, NULL);
     }
 
-    printf("Hra skončila! Server sa ukončuje.\n");
+    printf("Server ukončuje činnosť.\n");
+    pthread_mutex_destroy(&game_lock);
     close(sockfd);
     return 0;
 }

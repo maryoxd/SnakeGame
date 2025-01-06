@@ -11,6 +11,7 @@ typedef struct GameState {
     int score;           // Aktuálne skóre
     int elapsed_time;    // Uplynulý čas v sekundách
     int game_over;       // Indikátor, či hra skončila (1 = áno, 0 = nie)
+    int update_counter;
 } GameState;
 
 // Funkcie na prácu s GameState
