@@ -3,9 +3,7 @@
 #include <unistd.h>
 #include <termios.h>
 #include <stdio.h>
-#include <ctype.h>
 #include <stdbool.h>
-
 
 static struct termios oldt, newt;
 
@@ -35,23 +33,26 @@ char get_input(void) {
 void input(int *key, int *gameover) {
     if (kbhit()) {
         char user_input = get_input();
-        user_input = tolower(user_input);
 
+        // Spracovanie vstupu od používateľa
         switch (user_input) {
             case 'w':
-                if (*key != 4) *key = 3;  // Hore
+                if (*key != 2) *key = 0;  // Hore
                 break;
             case 'a':
-                if (*key != 2) *key = 1;  // Vľavo
+                if (*key != 3) *key = 1;  // Vľavo
                 break;
             case 's':
-                if (*key != 3) *key = 4;  // Dole
+                if (*key != 0) *key = 2;  // Dole
                 break;
             case 'd':
-                if (*key != 1) *key = 2;  // Vpravo
+                if (*key != 1) *key = 3;  // Vpravo
                 break;
             case 'x':
-                *gameover = true;  // Ukončenie hry
+                *gameover = 1;  // Ukončenie hry
+                break;
+            default:
+                // Ignorovať neplatný vstup
                 break;
         }
     }

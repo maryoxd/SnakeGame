@@ -3,8 +3,8 @@ CC = gcc
 CFLAGS = -Wall -Wextra -std=c11 -pthread
 
 # Súbory
-SRCS_SERVER = server.c world.c snake.c fruit.c input.c common.c gamestate.c
-SRCS_CLIENT = client.c world.c snake.c common.c gamestate.c fruit.c input.c 
+SRCS_SERVER = server.c world.c snake.c fruit.c input.c common.c gamestate.c menu.c
+SRCS_CLIENT = client.c world.c snake.c common.c gamestate.c fruit.c input.c menu.c 
 OBJS_SERVER = $(SRCS_SERVER:.c=.o)
 OBJS_CLIENT = $(SRCS_CLIENT:.c=.o)
 TARGET_SERVER = server
@@ -24,3 +24,4 @@ $(TARGET_CLIENT): $(OBJS_CLIENT)
 
 clean:
 	rm -f $(OBJS_SERVER) $(OBJS_CLIENT) $(TARGET_SERVER) $(TARGET_CLIENT)
+
