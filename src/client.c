@@ -12,14 +12,13 @@ int running = 1;            // Indikátor pre hlavný cyklus klienta
 int sockfd;                 // Socket klienta
 pthread_mutex_t lock;       // Mutex pre synchronizáciu herného stavu
 
-// Funkcia na kontrolu, či server beží
 int check_server_running(const char *ip, int port) {
-    int sockfd;
+    int temp_sockfd;
     struct sockaddr_in serv_addr;
 
-    sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sockfd < 0) {
-        perror("Chyba pri vytváraní socketu\n");
+    temp_sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    if (temp_sockfd < 0) {
+        perror("Chyba pri vytváraní socketu");
         return 0;
     }
 
@@ -28,16 +27,16 @@ int check_server_running(const char *ip, int port) {
     serv_addr.sin_port = htons(port);
 
     if (inet_pton(AF_INET, ip, &serv_addr.sin_addr) <= 0) {
-        close(sockfd);
+        close(temp_sockfd);
         return 0;
     }
 
-    if (connect(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
-        close(sockfd);
+    if (connect(temp_sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0) {
+        close(temp_sockfd);
         return 0;
     }
 
-    close(sockfd);
+    close(temp_sockfd);
     return 1;
 }
 
@@ -46,8 +45,6 @@ void start_server(const char *port) {
     pid_t pid = fork();
 
     if (pid == 0) {
-        // Detský proces -> spustenie servera
-        printf("Spúšťam server na porte %s...\n", port);
         execlp("./server", "./server", port, (char *)NULL);
         perror("Chyba pri spúšťaní servera");
         exit(EXIT_FAILURE);
@@ -56,7 +53,6 @@ void start_server(const char *port) {
         exit(EXIT_FAILURE);
     }
 
-    // Rodič -> čakáme 1 sekundu na naštartovanie servera
     sleep(1);
 }
 
@@ -87,7 +83,6 @@ void *input_thread(void *arg) {
         if (kbhit()) {
             input_p = getchar();
 
-            // Odosielanie vstupu serveru
             if (write(sockfd, &input_p, sizeof(input_p)) <= 0) {
                 perror("Chyba pri posielaní vstupu serveru");
                 running = 0;
@@ -95,7 +90,7 @@ void *input_thread(void *arg) {
             }
         }
 
-        usleep(50000); // Minimalizácia záťaže CPU
+        usleep(50000);
     }
 
     return NULL;
@@ -110,7 +105,6 @@ int main(int argc, char *argv[]) {
     const char *port = argv[1];
     int port_num = atoi(port);
 
-    // Kontrola, či server beží
     if (!check_server_running("127.0.0.1", port_num)) {
         printf("Server nebeží. Automaticky ho spúšťam...\n");
         start_server(port);
@@ -118,7 +112,6 @@ int main(int argc, char *argv[]) {
         printf("Server už beží na porte %s\n", port);
     }
 
-    // Pripojenie k serveru
     struct sockaddr_in serv_addr;
     sockfd = socket(AF_INET, SOCK_STREAM, 0);
     if (sockfd < 0) {
@@ -143,16 +136,12 @@ int main(int argc, char *argv[]) {
     printf("Pripojené na server\n");
 
     enable_raw_mode();
-
-    // Inicializácia mutexu
     pthread_mutex_init(&lock, NULL);
 
-    // Spustenie vlákien
     pthread_t recv_tid, input_tid;
     pthread_create(&recv_tid, NULL, receive_thread, NULL);
     pthread_create(&input_tid, NULL, input_thread, NULL);
 
-    // Hlavný cyklus vykreslenia
     while (running) {
         pthread_mutex_lock(&lock);
         gamestate_draw(&game_state);
@@ -163,10 +152,9 @@ int main(int argc, char *argv[]) {
             running = 0;
         }
 
-        usleep(100000); // Obnovenie vykreslenia každých 100 ms
+        usleep(100000);
     }
 
-    // Čistenie
     pthread_join(recv_tid, NULL);
     pthread_join(input_tid, NULL);
     pthread_mutex_destroy(&lock);
@@ -175,3 +163,4 @@ int main(int argc, char *argv[]) {
     close(sockfd);
     return 0;
 }
+

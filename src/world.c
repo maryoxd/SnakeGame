@@ -61,4 +61,3 @@ void world_draw(const World *world) {
         printf("\n");
     }
 }
-

@@ -11,7 +11,6 @@ pthread_mutex_t game_lock;     // Mutex na synchronizáciu prístupu k hernému 
 int current_direction = 2;     // Smer pohybu (predvolene dole)
 int client_connected = 0;      // Indikátor pripojenia klienta
 
-// Funkcia na spracovanie vstupov od klienta
 void *client_input_thread(void *arg) {
     int client_sock = *(int *)arg;
     char input;
@@ -36,7 +35,6 @@ void *client_input_thread(void *arg) {
     return NULL;
 }
 
-// Funkcia na spracovanie hry
 void *game_update_thread(void *arg) {
     int client_sock = *(int *)arg;
 
@@ -53,10 +51,8 @@ void *game_update_thread(void *arg) {
             }
         }
 
-        usleep(100000); // Rýchlosť hry (100 ms)
+        usleep(100000);
     }
-
-    printf("Hra skončila! Skóre: %d\n", game_state.score);
     close(client_sock);
     return NULL;
 }
@@ -98,11 +94,9 @@ int main(int argc, char *argv[]) {
 
     printf("Server počúva na porte %d...\n", port);
 
-    // Inicializácia herného stavu a mutexu
     gamestate_init(&game_state, "hernysvet.txt", "ovocie.txt");
     pthread_mutex_init(&game_lock, NULL);
 
-    // Prijímanie klientov
     while (1) {
         client_sock = accept(sockfd, (struct sockaddr *)&cli_addr, &cli_len);
         if (client_sock < 0) {
@@ -113,7 +107,6 @@ int main(int argc, char *argv[]) {
         printf("Klient pripojený.\n");
         client_connected = 1;
 
-        // Spustenie vlákien
         pthread_t input_tid, update_tid;
         pthread_create(&input_tid, NULL, client_input_thread, &client_sock);
         pthread_create(&update_tid, NULL, game_update_thread, &client_sock);

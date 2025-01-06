@@ -86,4 +86,3 @@ void gamestate_draw(const GameState *state) {
 int gamestate_is_game_over(const GameState *state) {
     return state->game_over;
 }
-

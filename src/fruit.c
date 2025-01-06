@@ -11,8 +11,7 @@ int fruit_manager_load(FruitManager *manager, const char *filename) {
   if(!file) {
     perror("Chyba pri otvarani suboru na ovocie!\n");
     return -1;
-  }
-  
+  } 
   
   int x;
   int y;
@@ -25,13 +24,13 @@ int fruit_manager_load(FruitManager *manager, const char *filename) {
   
   fclose(file);
   return 0;
-
 }
 
 int fruit_next(FruitManager *manager, Fruit *fruit) {
   if(manager->current_index >= manager->count) {
     return -1;
   }
+
   *fruit = manager->fruits[manager->current_index];
   manager->current_index++;
   return 0;
