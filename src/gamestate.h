@@ -19,6 +19,7 @@ void gamestate_init(GameState *state, const char *world_file, const char *fruit_
 void gamestate_update(GameState *state, int direction);
 void gamestate_draw(const GameState *state);
 int gamestate_is_game_over(const GameState *state);
+void gamestate_reset(GameState *state, const char *world_file, const char *fruit_file);
 
 #endif
 

@@ -7,10 +7,10 @@
 #include "gamestate.h"
 #include "input.h"
 
-GameState game_state;       // Herný stav
-int running = 1;            // Indikátor pre hlavný cyklus klienta
-int sockfd;                 // Socket klienta
-pthread_mutex_t lock;       // Mutex pre synchronizáciu herného stavu
+GameState game_state;
+int running = 1;
+int sockfd;
+pthread_mutex_t lock;
 
 int check_server_running(const char *ip, int port) {
     int temp_sockfd;
@@ -40,7 +40,6 @@ int check_server_running(const char *ip, int port) {
     return 1;
 }
 
-// Funkcia na spustenie servera
 void start_server(const char *port) {
     pid_t pid = fork();
 
@@ -56,7 +55,6 @@ void start_server(const char *port) {
     sleep(1);
 }
 
-// Vlákno na čítanie stavu od servera
 void *receive_thread(void *arg) {
     while (running) {
         GameState temp_state;
@@ -75,10 +73,8 @@ void *receive_thread(void *arg) {
     return NULL;
 }
 
-// Vlákno na odosielanie vstupov serveru
 void *input_thread(void *arg) {
     char input_p;
-
     while (running) {
         if (kbhit()) {
             input_p = getchar();
@@ -89,11 +85,28 @@ void *input_thread(void *arg) {
                 break;
             }
         }
-
         usleep(50000);
     }
-
     return NULL;
+}
+
+void show_menu() {
+    disable_raw_mode();
+    printf("1 - Reštartovať hru\n");
+    printf("2 - Odísť\n");
+    char choice;
+    scanf(" %c", &choice);
+
+    if (write(sockfd, &choice, sizeof(choice)) <= 0) {
+        perror("Chyba pri posielaní výberu serveru");
+        running = 0;
+    }
+
+    if (choice == '2') {
+        running = 0;
+    }
+
+    enable_raw_mode();
 }
 
 int main(int argc, char *argv[]) {
@@ -149,7 +162,7 @@ int main(int argc, char *argv[]) {
 
         if (gamestate_is_game_over(&game_state)) {
             printf("Hra skončila! Skóre: %d\n", game_state.score);
-            running = 0;
+            show_menu();
         }
 
         usleep(100000);
@@ -158,7 +171,6 @@ int main(int argc, char *argv[]) {
     pthread_join(recv_tid, NULL);
     pthread_join(input_tid, NULL);
     pthread_mutex_destroy(&lock);
-
     disable_raw_mode();
     close(sockfd);
     return 0;

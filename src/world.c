@@ -5,7 +5,7 @@
 #define ZELENA "\033[1;32m"
 #define ORANZOVA "\033[38;5;214m"
 #define MODRA "\033[1;34m"
-#define RESET_FARBA "\033[0m" 
+#define RESET_FARBA "\033[0m"
 
 void world_init(World *world) {
     world->width = 0;
@@ -61,3 +61,4 @@ void world_draw(const World *world) {
         printf("\n");
     }
 }
+
