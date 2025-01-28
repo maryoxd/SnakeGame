@@ -28,12 +28,13 @@ Vstupy (input.c):
 
 Spracováva vstupy hráča (WASD na ovládanie pohybu hada).
 Obsahuje logiku pre zmenu smeru pohybu hada.
-Herné mechaniky
-Režimy hry:
 
-Štandardný režim: Hra trvá, kým nie sú všetci hráči mŕtvi.
+Herné mechaniky
+### Režimy hry:
+
+### Štandardný režim: Hra trvá, kým nie sú všetci hráči mŕtvi.
 Časový režim: Hra sa končí po uplynutí stanoveného času.
-Typy svetov:
+### Typy svetov:
 
 Bez prekážok: Had môže prechádzať cez okraje mapy a objaví sa na opačnej strane.
 S prekážkami: Svet obsahuje pevné prekážky, pričom had sa musí vyhnúť zrážke.
@@ -43,32 +44,22 @@ Had: Rastie po zjedení ovocia. Hra pre neho končí pri kolízii so stenou, pre
 Ovocie: Generuje sa náhodne na mape.
 Prekážky: Statické objekty generované podľa veľkosti mapy.
 Spustenie hry
-Závislosti:
 
+### Závislosti:
 Operačný systém Linux.
 GCC kompilátor.
 Knižnica ncurses (inštalácia: sudo apt-get install libncurses5-dev libncursesw5-dev).
-Kompilácia:
 
+### Kompilácia:
 Pre kompiláciu projektu použite príkaz:
-bash
-Kopírovať
-Upraviť
 make all
+
 Spustenie hry:
-
-Server:
-bash
-Kopírovať
-Upraviť
+###Server:
 ./server_t
-Klient:
-bash
-Kopírovať
-Upraviť
 ./klient_t
-Ovládanie:
 
+### Ovládanie:
 Pohyb hada: Používajte klávesy W (hore), A (vľavo), S (dole), D (vpravo).
 Technické výzvy a riešenia
 Synchronizácia: Použité mutexy na zabezpečenie konzistencie údajov pri spracovaní vstupov od viacerých klientov.
