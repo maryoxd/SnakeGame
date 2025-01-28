@@ -1,21 +1,40 @@
 #ifndef WORLD_H
 #define WORLD_H
 
-#include "common.h"
+#include <unistd.h>
+#include "snake.h"
 #include "fruit.h"
+#include <stdbool.h>
+#include <ncurses.h>
 
-#define MAX_WIDTH 100
-#define MAX_HEIGHT 100
+#define EMPTY ' ' // Prázdno
+#define WALL '#'  // Stena
+#define SNAKE 'O' // Had
+#define FRUIT '*' // Ovocie
+#define OBSTACLE 'X' // Prekážka
+#define COLOR_PAIR_FRUIT 1
+#define COLOR_PAIR_SNAKE 2
+#define COLOR_PAIR_WALL 3
+#define COLOR_PAIR_OBSTACLE 4
+#define MAX_PLAYERS 10
 
 typedef struct {
-  int width;
-  int height;
-  char grid[MAX_HEIGHT][MAX_WIDTH];
-  FruitManager fruit_manager;
+    int width;
+    int height;
+    char** grid;
+    Snake snakes[MAX_PLAYERS];
+    int player_count;
+    Fruit fruit;
+    bool game_over;
+    int typ;
+    int rezim;
 } World;
 
-void world_init(World *world);
-int world_load (World *world, const  char *filename);
-void world_draw(const World *world);
+void world_init(World* world, int width, int height, int rezim, int typ);
+void world_update(World* world, int keys[MAX_PLAYERS]);
+void world_draw(const World* world);
+void world_free(World *world);
+void world_add_player(World* world);
 
 #endif
+

@@ -5,56 +5,26 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-static struct termios oldt, newt;
+void input(int* key_player1) {
+    int ch;
 
-void enable_raw_mode() {
-    tcgetattr(STDIN_FILENO, &oldt);
-    newt = oldt;
-    newt.c_lflag &= ~(ICANON | ECHO);
-    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-}
-
-void disable_raw_mode() {
-    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-}
-
-int kbhit(void) {
-    struct timeval tv = {0, 0};
-    fd_set fds;
-    FD_ZERO(&fds);
-    FD_SET(STDIN_FILENO, &fds);
-    return select(STDIN_FILENO + 1, &fds, NULL, NULL, &tv) > 0;
-}
-
-char get_input(void) {
-    return getchar();
-}
-
-void input(int *key, int *gameover) {
-    if (kbhit()) {
-        char user_input = get_input();
-
-        // Spracovanie vstupu od používateľa
-        switch (user_input) {
+    // Spracovanie vstupu v cykle
+    while ((ch = getch()) != ERR) {
+        // Spracovanie vstupu od hráča 1 (WASD)
+        switch (ch) {
             case 'w':
-                if (*key != 2) *key = 0;  // Hore
+                if (*key_player1 != 2) *key_player1 = 0;  // Hore
                 break;
             case 'a':
-                if (*key != 3) *key = 1;  // Vľavo
+                if (*key_player1 != 3) *key_player1 = 1;  // Vľavo
                 break;
             case 's':
-                if (*key != 0) *key = 2;  // Dole
+                if (*key_player1 != 0) *key_player1 = 2;  // Dole
                 break;
             case 'd':
-                if (*key != 1) *key = 3;  // Vpravo
-                break;
-            case 'x':
-                *gameover = 1;  // Ukončenie hry
-                break;
-            default:
-                // Ignorovať neplatný vstup
+                if (*key_player1 != 1) *key_player1 = 3;  // Vpravo
                 break;
         }
+
     }
 }
-

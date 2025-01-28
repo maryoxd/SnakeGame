@@ -1,27 +1,51 @@
-# Kompilátor a flagy
+# Názvy výsledných programov
+SERVER_TARGET = server_t
+CLIENT_TARGET = klient_t
+
+# Kompilátor
 CC = gcc
-CFLAGS = -Wall -Wextra -std=c11 -pthread
 
-# Súbory
-SRCS_SERVER = server.c world.c snake.c fruit.c input.c common.c gamestate.c 
-SRCS_CLIENT = client.c world.c snake.c common.c gamestate.c fruit.c input.c  
-OBJS_SERVER = $(SRCS_SERVER:.c=.o)
-OBJS_CLIENT = $(SRCS_CLIENT:.c=.o)
-TARGET_SERVER = server
-TARGET_CLIENT = client
+# Flagy pre kompilátor
+CFLAGS = -Wall -Wextra -pedantic -std=c99 -g -D_GNU_SOURCE
 
-# Ciele
-all: $(TARGET_SERVER) $(TARGET_CLIENT)
+# Knižnice
+LDFLAGS = -lncurses -lpthread
 
-$(TARGET_SERVER): $(OBJS_SERVER)
-	$(CC) $(CFLAGS) -o $@ $^
+# Zdrojové súbory pre server
+SERVER_SRC = server_t.c world.c snake.c input.c fruit.c
 
-$(TARGET_CLIENT): $(OBJS_CLIENT)
-	$(CC) $(CFLAGS) -o $@ $^
+# Zdrojové súbory pre klienta
+CLIENT_SRC = klient_t.c input.c
 
-%.o: %.c
+# Hlavičkové súbory
+HEADERS = world.h snake.h input.h fruit.h position.h server.h
+
+# Objektové súbory pre server
+SERVER_OBJ = $(SERVER_SRC:.c=.o)
+
+# Objektové súbory pre klienta
+CLIENT_OBJ = $(CLIENT_SRC:.c=.o)
+
+# Pravidlo pre vytvorenie všetkých cieľov
+all: $(SERVER_TARGET) $(CLIENT_TARGET)
+
+# Pravidlo pre vytvorenie spustiteľného súboru servera
+server: $(SERVER_TARGET)
+
+$(SERVER_TARGET): $(SERVER_OBJ)
+	$(CC) $(CFLAGS) -o $(SERVER_TARGET) $(SERVER_OBJ) $(LDFLAGS)
+
+# Pravidlo pre vytvorenie spustiteľného súboru klienta
+klient: $(CLIENT_TARGET)
+
+$(CLIENT_TARGET): $(CLIENT_OBJ)
+	$(CC) $(CFLAGS) -o $(CLIENT_TARGET) $(CLIENT_OBJ) $(LDFLAGS)
+
+# Pravidlo pre preklad každého .c súboru na .o
+%.o: %.c $(HEADERS)
 	$(CC) $(CFLAGS) -c $< -o $@
 
+# Pravidlo pre vyčistenie súborov
 clean:
-	rm -f $(OBJS_SERVER) $(OBJS_CLIENT) $(TARGET_SERVER) $(TARGET_CLIENT)
+	rm -f $(SERVER_OBJ) $(CLIENT_OBJ) $(SERVER_TARGET) $(CLIENT_TARGET)
 
