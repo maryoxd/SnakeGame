@@ -55,8 +55,7 @@ Pre kompiláciu projektu použite príkaz:
 make all
 
 ## Spustenie hry:
-###Server:
-./server_t
+### Klient:
 ./klient_t
 
 ### Ovládanie:
@@ -65,7 +64,8 @@ Technické výzvy a riešenia
 Synchronizácia: Použité mutexy na zabezpečenie konzistencie údajov pri spracovaní vstupov od viacerých klientov.
 Medziprocesná komunikácia: Realizovaná pomocou TCP socketov, ktoré zabezpečujú výmenu dát medzi serverom a klientmi.
 Flexibilita hry: Podpora rôznych režimov hry a typov svetov.
-Možné vylepšenia
+
+## Možné vylepšenia
 Podpora grafického rozhrania pre lepšiu vizualizáciu.
 Rozšírenie o špeciálne herné prvky (napr. power-upy, dynamické prekážky).
 Optimalizácia prenosu dát medzi serverom a klientmi.
