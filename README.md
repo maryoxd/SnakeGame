@@ -1,71 +1,27 @@
-# SnakeGame
-## [SK] Popis projektu
-Tento projekt je implementáciou klasickej arkádovej hry Hadík v programovacom jazyku C, ktorá bola vytvorená ako tímová semestrálna práca. Hra podporuje režim pre jedného alebo viacerých hráčov, pričom je realizovaná na báze klient-server architektúry. Server spravuje herný svet a komunikuje s klientmi, ktorí ovládajú svojich hadov a interagujú so svetom v reálnom čase.
+# 🐍 Snake Game – Classic Arcade Remake in C  
 
-## Štruktúra projektu
+**Snake Game** is a **C-based console game** that recreates the classic **Snake** experience. The player navigates a snake to eat food, growing in length while avoiding walls and itself. The game runs in real time, providing a fun and challenging experience.  
 
-Server (server_t.c):
-Zodpovedá za inicializáciu herného sveta, správu pohybu hadov, generovanie ovocia, detekciu kolízií a synchronizáciu klientov.
-Implementuje viacvláknové spracovanie pomocou pthread pre každého pripojeného klienta.
-Komunikácia medzi serverom a klientmi prebieha cez TCP sockety.
+## 🎮 Features  
+- **Classic snake movement** – Navigate using arrow keys.  
+- **Real-time gameplay** – Movement updates dynamically with controlled speed.  
+- **Food generation** – Spawns food at random locations.  
+- **Collision detection** – The game ends if the snake hits a wall or itself.  
+- **Score tracking** – Points increase with every piece of food eaten.  
 
-Klient (klient_t.c):
-Pripája sa k serveru, odosiela vstupy (napr. smer pohybu hada) a prijíma aktuálny stav herného sveta.
-Vykresľuje hernú mapu v termináli pomocou knižnice ncurses.
+## 🛠️ Technologies Used  
+- **C (Standard Library Functions)**  
+- **System Timing (for game speed control)**  
+- **Console-based Rendering**  
+- **Randomized Food Placement**  
 
-Herný svet (world.c):
-Spravuje hernú mapu, pozície hráčov, ovocia a prekážok.
-Obsahuje logiku pre rôzne herné režimy a generovanie objektov na mape.
+## 🚀 How to Install & Run  
+1. **Clone the repository:**  
+   ```bash
+   git clone https://github.com/maryoxd/SnakeGame.git  
+   cd SnakeGame
+2. **Compile and run the game:**
+   ```bash
+   gcc -o snake_game snake.c  
+   ./snake_game  
 
-Had (snake.c):
-Implementuje správu hada (rast, pohyb, detekciu kolízií).
-Obsahuje logiku pre aktualizáciu pozícií tela hada na základe pohybu.
-
-Ovocie (fruit.c):
-Generuje ovocie na náhodných pozíciách na mape.
-Spravuje jeho zber hráčmi.
-
-Vstupy (input.c):
-Spracováva vstupy hráča (WASD na ovládanie pohybu hada).
-Obsahuje logiku pre zmenu smeru pohybu hada.
-
-## Herné mechaniky
-### Režimy hry:
-
-### Štandardný režim: Hra trvá, kým nie sú všetci hráči mŕtvi.
-Časový režim: Hra sa končí po uplynutí stanoveného času.
-### Typy svetov:
-
-Bez prekážok: Had môže prechádzať cez okraje mapy a objaví sa na opačnej strane.
-S prekážkami: Svet obsahuje pevné prekážky, pričom had sa musí vyhnúť zrážke.
-Herné objekty:
-
-Had: Rastie po zjedení ovocia. Hra pre neho končí pri kolízii so stenou, prekážkou, vlastným telom alebo iným hadom.
-Ovocie: Generuje sa náhodne na mape.
-Prekážky: Statické objekty generované podľa veľkosti mapy.
-Spustenie hry
-
-### Závislosti:
-Operačný systém Linux.
-GCC kompilátor.
-Knižnica ncurses (inštalácia: sudo apt-get install libncurses5-dev libncursesw5-dev).
-
-## Kompilácia:
-Pre kompiláciu projektu použite príkaz:
-make all
-
-## Spustenie hry:
-### Klient:
-./klient_t
-
-### Ovládanie:
-Pohyb hada: Používajte klávesy W (hore), A (vľavo), S (dole), D (vpravo).
-Technické výzvy a riešenia
-Synchronizácia: Použité mutexy na zabezpečenie konzistencie údajov pri spracovaní vstupov od viacerých klientov.
-Medziprocesná komunikácia: Realizovaná pomocou TCP socketov, ktoré zabezpečujú výmenu dát medzi serverom a klientmi.
-Flexibilita hry: Podpora rôznych režimov hry a typov svetov.
-
-## Možné vylepšenia
-Podpora grafického rozhrania pre lepšiu vizualizáciu.
-Rozšírenie o špeciálne herné prvky (napr. power-upy, dynamické prekážky).
-Optimalizácia prenosu dát medzi serverom a klientmi.
